@@ -6,9 +6,62 @@
 
 generator client {
   provider = "prisma-client"
-  output   = "../generated/prisma"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
   provider = "postgresql"
+}
+
+// Define your database schema
+
+model Book {
+  id        Int       @id @default(autoincrement())
+  name      String
+  group     String?
+  authorId  Int       @map("author_id")
+  
+  author    Author    @relation(fields: [authorId], references: [id])
+  histories History[]
+
+  @@map("books")
+}
+
+model Member {
+  // Now auto-generates a unique string UUID
+  memberNo  String    @id @default(uuid()) @map("member_no") 
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  mobile    String?
+  
+  histories History[]
+
+  @@map("members")
+}
+
+model Author {
+  id        Int     @id @default(autoincrement())
+  firstName String  @map("first_name")
+  lastName  String  @map("last_name")
+  agency    String?
+  
+  books     Book[]
+
+  @@map("authors")
+}
+
+model History {
+  id           Int       @id @default(autoincrement())
+  bookId       Int       @map("book_id")
+  memberNo     String    @map("member_no")
+  expectReturn DateTime  @map("expect_return")
+  returnedAt   DateTime? @map("returned_at")
+  
+  // Field is batchId, Database Column is 'batch_id'
+  batchId      String    @map("batch_id") 
+  
+  book   Book   @relation(fields: [bookId], references: [id])
+  member Member @relation(fields: [memberNo], references: [memberNo])
+
+  @@map("histories")
 }
