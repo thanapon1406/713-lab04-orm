@@ -1,6 +1,5 @@
 import type { Book } from "../generated/prisma/client";
 import { BookRepository } from "../repositories/BookRepository";
-import { query } from "../db/index";
 
 export class BookService {
   constructor(private bookRepository: BookRepository) {}
