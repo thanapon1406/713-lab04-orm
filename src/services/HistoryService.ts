@@ -4,12 +4,12 @@ import { HistoryRepository } from "../repositories/HistoryRepository";
 export class HistoryService {
   constructor(private historyRepository: HistoryRepository) {}
 
-  async getAllHistorys(query: Record<string, any> = {}): Promise<History[]> {
-    const historys = await this.historyRepository.findAll(query);
-    return historys;
+  async getAllHistories(query: Record<string, any> = {}): Promise<History[]> {
+    const histories = await this.historyRepository.findAll(query);
+    return histories;
   }
 
-  async getAllHistorysWithPagination(
+  async getAllHistoriesWithPagination(
     page: number,
     limit: number,
     query: Record<string, any> = {}
