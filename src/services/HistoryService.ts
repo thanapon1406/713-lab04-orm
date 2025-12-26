@@ -8,6 +8,26 @@ export class HistoryService {
     const historys = await this.historyRepository.findAll(query);
     return historys;
   }
+
+  async getAllHistorysWithPagination(
+    page: number,
+    limit: number,
+    query: Record<string, any> = {}
+  ): Promise<{ data: History[]; total: number; page: number; limit: number }> {
+    const total = await this.historyRepository.count(query);
+    const data = await this.historyRepository.findManyWithPagination(
+      query,
+      page,
+      limit
+    );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance

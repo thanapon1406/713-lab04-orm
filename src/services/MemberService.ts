@@ -8,6 +8,26 @@ export class MemberService {
     const members = await this.memberRepository.findAll(query);
     return members;
   }
+
+  async getAllMembersWithPagination(
+    page: number,
+    limit: number,
+    query: Record<string, any> = {}
+  ): Promise<{ data: Member[]; total: number; page: number; limit: number }> {
+    const total = await this.memberRepository.count(query);
+    const data = await this.memberRepository.findManyWithPagination(
+      query,
+      page,
+      limit
+    );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance

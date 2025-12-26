@@ -8,6 +8,26 @@ export class BookService {
     const books = await this.bookRepository.findAll(query);
     return books;
   }
+
+  async getAllBoooksWithPagination(
+    page: number,
+    limit: number,
+    query: Record<string, any> = {}
+  ): Promise<{ data: Book[]; total: number; page: number; limit: number }> {
+    const total = await this.bookRepository.count(query);
+    const data = await this.bookRepository.findManyWithPagination(
+      query,
+      page,
+      limit
+    );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance
