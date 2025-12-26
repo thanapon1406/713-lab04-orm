@@ -27,6 +27,7 @@ router.get("/paginated", async (req: Request, res: Response) => {
     return res.status(404).json({ message: "No histories found" });
   }
 
+  res.setHeader("x-total-count", result.total.toString());
   res.json(result);
 });
 

@@ -24,7 +24,7 @@ router.get("/paginated", async (req: Request, res: Response) => {
   if (result.data.length === 0) {
     return res.status(404).json({ message: "No books found" });
   }
-
+  res.setHeader("x-total-count", result.total.toString());
   res.json(result);
 });
 
