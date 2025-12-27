@@ -54,6 +54,29 @@ export class BookService {
       limit,
     };
   }
+
+  async searchBooksWithRelations(
+    keyword: string,
+    page: number,
+    limit: number
+  ): Promise<{ data: any[]; total: number; page: number; limit: number }> {
+    const total = await this.bookRepository.countWithKeywordWithRelations(
+      keyword
+    );
+    const data =
+      await this.bookRepository.findManyWithPaginationAndKeywordWithRelations(
+        keyword,
+        page,
+        limit
+      );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance

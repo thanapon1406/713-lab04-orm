@@ -6,6 +6,8 @@ import {
   mapQueryToPrismaOptionsWithPagination,
   mapQueryToPrismaOptionsWithKeywordSearch,
   mapQueryToPrismaOptionsWithKeywordSearchWithoutPagination,
+  mapQueryWithKeywordSearchAndRelations,
+  buildKeywordSearchWhereWithRelations,
 } from "../utils/queryMapper";
 
 export class BookRepository {
@@ -54,6 +56,63 @@ export class BookRepository {
       ["name", "group"]
     );
     return prisma.book.count(options);
+  }
+
+  async findManyWithPaginationAndKeywordWithRelations(
+    keyword: string,
+    page: number,
+    limit: number
+  ): Promise<any[]> {
+    const options = mapQueryWithKeywordSearchAndRelations(
+      keyword,
+      {
+        directFields: ["name", "group"],
+        relations: {
+          author: {
+            fields: ["firstName", "lastName"],
+          },
+          histories: {
+            useMany: true,
+            nestedRelation: {
+              name: "member",
+              fields: ["firstName", "lastName"],
+            },
+          },
+        },
+      },
+      {
+        author: true,
+        histories: {
+          include: {
+            member: true,
+          },
+        },
+      },
+      page,
+      limit
+    );
+
+    return prisma.book.findMany(options);
+  }
+
+  async countWithKeywordWithRelations(keyword: string): Promise<number> {
+    const where = buildKeywordSearchWhereWithRelations(keyword, {
+      directFields: ["name", "group"],
+      relations: {
+        author: {
+          fields: ["firstName", "lastName"],
+        },
+        histories: {
+          useMany: true,
+          nestedRelation: {
+            name: "member",
+            fields: ["firstName", "lastName"],
+          },
+        },
+      },
+    });
+
+    return prisma.book.count({ where });
   }
 
   async create(data: Book): Promise<Book> {
