@@ -28,6 +28,32 @@ export class BookService {
       limit,
     };
   }
+
+  async getAllBoooksWithPaginationAndKeywordByUsingOr(
+    page: number,
+    limit: number,
+    keyword: string,
+    query: Record<string, any> = {}
+  ): Promise<{ data: Book[]; total: number; page: number; limit: number }> {
+    const total = await this.bookRepository.countWithKeywordByUsingOr(
+      query,
+      keyword
+    );
+    const data =
+      await this.bookRepository.findManyWithPaginationAndKeywordByUsingOr(
+        query,
+        keyword,
+        page,
+        limit
+      );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance

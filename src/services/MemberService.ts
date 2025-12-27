@@ -28,6 +28,32 @@ export class MemberService {
       limit,
     };
   }
+
+  async getAllMembersWithPaginationAndKeywordByUsingOr(
+    page: number,
+    limit: number,
+    keyword: string,
+    query: Record<string, any> = {}
+  ): Promise<{ data: Member[]; total: number; page: number; limit: number }> {
+    const total = await this.memberRepository.countWithKeywordByUsingOr(
+      query,
+      keyword
+    );
+    const data =
+      await this.memberRepository.findManyWithPaginationAndKeywordByUsingOr(
+        query,
+        keyword,
+        page,
+        limit
+      );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance

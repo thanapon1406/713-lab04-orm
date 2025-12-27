@@ -28,6 +28,32 @@ export class AuthorService {
       limit,
     };
   }
+
+  async getAllAuthorsWithPaginationAndKeywordByUsingOr(
+    page: number,
+    limit: number,
+    keyword: string,
+    query: Record<string, any> = {}
+  ): Promise<{ data: Author[]; total: number; page: number; limit: number }> {
+    const total = await this.authorRepository.countWithKeywordByUsingOr(
+      query,
+      keyword
+    );
+    const data =
+      await this.authorRepository.findManyWithPaginationAndKeywordByUsingOr(
+        query,
+        keyword,
+        page,
+        limit
+      );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance

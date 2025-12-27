@@ -2,6 +2,8 @@ import type { Member } from "../generated/prisma/client";
 import { prisma } from "../lib/Prisma";
 import {
   mapQueryToPrismaOptions,
+  mapQueryToPrismaOptionsWithKeywordSearch,
+  mapQueryToPrismaOptionsWithKeywordSearchWithoutPagination,
   mapQueryToPrismaOptionsWithOutPagination,
   mapQueryToPrismaOptionsWithPagination,
 } from "../utils/queryMapper";
@@ -24,6 +26,34 @@ export class MemberRepository {
   async count(query: Record<string, any> = {}): Promise<number> {
     const where = mapQueryToPrismaOptionsWithOutPagination(query);
     return prisma.member.count(where);
+  }
+
+  async countWithKeywordByUsingOr(
+    query: Record<string, any> = {},
+    keyword: string
+  ): Promise<number> {
+    const options = mapQueryToPrismaOptionsWithKeywordSearchWithoutPagination(
+      query,
+      keyword,
+      ["memberNo", "firstName", "lastName", "mobile"]
+    );
+    return prisma.member.count(options);
+  }
+
+  async findManyWithPaginationAndKeywordByUsingOr(
+    query: Record<string, any> = {},
+    keyword: string,
+    page: number,
+    limit: number
+  ): Promise<Member[]> {
+    const options = mapQueryToPrismaOptionsWithKeywordSearch(
+      query,
+      keyword,
+      ["memberNo", "firstName", "lastName", "mobile"],
+      page,
+      limit
+    );
+    return prisma.member.findMany(options);
   }
 
   async create(data: Member): Promise<Member> {

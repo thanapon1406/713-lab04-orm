@@ -63,4 +63,25 @@ router.get("/due-date", async (req: Request, res: Response) => {
   res.json(histories);
 });
 
+router.get("/search", async (req: Request, res: Response) => {
+  const page = parseInt(req.query.page as string) || 1;
+  const limit = parseInt(req.query.limit as string) || 10;
+  const keyword = (req.query.keyword as string) || "";
+
+  const result =
+    await historyService.getAllHistoriesWithPaginationAndKeywordByUsingOr(
+      page,
+      limit,
+      keyword,
+      req.query as Record<string, any>
+    );
+
+  if (result.data.length === 0) {
+    return res.status(404).json({ message: "No histories found" });
+  }
+
+  res.setHeader("x-total-count", result.total.toString());
+  res.json(result);
+});
+
 export default router;

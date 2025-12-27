@@ -1,10 +1,8 @@
-// Helper to check if string is a valid date
 function isDateString(value: string): boolean {
   const date = new Date(value);
   return !isNaN(date.getTime()) && /^\d{4}-\d{2}-\d{2}/.test(value);
 }
 
-// Helper to convert query value to appropriate Prisma filter
 function convertQueryValue(key: string, value: any) {
   if (value === undefined || value === null) {
     return undefined;
@@ -64,6 +62,58 @@ export function mapQueryToPrismaOptionsWithOutPagination(
   const where: Record<string, any> = {};
   Object.keys(query).forEach((key) => {
     if (key !== "page" && key !== "limit") {
+      const converted = convertQueryValue(key, query[key]);
+      if (converted !== undefined) {
+        where[key] = converted;
+      }
+    }
+  });
+  return { where };
+}
+
+export function mapQueryToPrismaOptionsWithKeywordSearch(
+  query: Record<string, any>,
+  keyword: string,
+  searchFields: string[],
+  page: number,
+  limit: number
+) {
+  const where: any = {};
+
+  if (keyword) {
+    where.OR = searchFields.map((field) => ({
+      [field]: { contains: keyword, mode: "insensitive" },
+    }));
+  }
+
+  Object.keys(query).forEach((key) => {
+    if (key !== "page" && key !== "limit" && key !== "keyword") {
+      const converted = convertQueryValue(key, query[key]);
+      if (converted !== undefined) {
+        where[key] = converted;
+      }
+    }
+  });
+
+  const skip = (page - 1) * limit;
+  return { where, skip, take: limit };
+}
+
+export function mapQueryToPrismaOptionsWithKeywordSearchWithoutPagination(
+  query: Record<string, any>,
+  keyword: string,
+  searchFields: string[]
+) {
+  const where: any = {};
+
+  if (keyword) {
+    where.OR = searchFields.map((field) => ({
+      [field]: { contains: keyword, mode: "insensitive" },
+    }));
+  }
+
+  Object.keys(query).forEach((key) => {
+    if (key !== "page" && key !== "limit" && key !== "keyword") {
       const converted = convertQueryValue(key, query[key]);
       if (converted !== undefined) {
         where[key] = converted;

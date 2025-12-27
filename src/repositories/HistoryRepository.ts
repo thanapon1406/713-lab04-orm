@@ -2,6 +2,8 @@ import type { History } from "../generated/prisma/client";
 import { prisma } from "../lib/Prisma";
 import {
   mapQueryToPrismaOptions,
+  mapQueryToPrismaOptionsWithKeywordSearch,
+  mapQueryToPrismaOptionsWithKeywordSearchWithoutPagination,
   mapQueryToPrismaOptionsWithOutPagination,
   mapQueryToPrismaOptionsWithPagination,
 } from "../utils/queryMapper";
@@ -24,6 +26,34 @@ export class HistoryRepository {
   async count(query: Record<string, any> = {}): Promise<number> {
     const where = mapQueryToPrismaOptionsWithOutPagination(query);
     return prisma.history.count(where);
+  }
+
+  async countWithKeywordByUsingOr(
+    query: Record<string, any> = {},
+    keyword: string
+  ): Promise<number> {
+    const options = mapQueryToPrismaOptionsWithKeywordSearchWithoutPagination(
+      query,
+      keyword,
+      ["memberNo", "expectReturn", "returnedAt", "batchId"]
+    );
+    return prisma.history.count(options);
+  }
+
+  async findManyWithPaginationAndKeywordByUsingOr(
+    query: Record<string, any> = {},
+    keyword: string,
+    page: number,
+    limit: number
+  ): Promise<History[]> {
+    const options = mapQueryToPrismaOptionsWithKeywordSearch(
+      query,
+      keyword,
+      ["memberNo", "expectReturn", "returnedAt", "batchId"],
+      page,
+      limit
+    );
+    return prisma.history.findMany(options);
   }
 
   async create(data: History): Promise<History> {

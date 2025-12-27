@@ -28,6 +28,32 @@ export class HistoryService {
       limit,
     };
   }
+
+  async getAllHistoriesWithPaginationAndKeywordByUsingOr(
+    page: number,
+    limit: number,
+    keyword: string,
+    query: Record<string, any> = {}
+  ): Promise<{ data: History[]; total: number; page: number; limit: number }> {
+    const total = await this.historyRepository.countWithKeywordByUsingOr(
+      query,
+      keyword
+    );
+    const data =
+      await this.historyRepository.findManyWithPaginationAndKeywordByUsingOr(
+        query,
+        keyword,
+        page,
+        limit
+      );
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+    };
+  }
 }
 
 // Export singleton instance
