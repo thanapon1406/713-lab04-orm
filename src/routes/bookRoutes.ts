@@ -1,8 +1,10 @@
 import { Router, type Request, type Response } from "express";
 import { bookService } from "../services/BookService";
+import multer from "multer";
+import { uploadFile } from "../services/UploadFileService";
 
 const router = Router();
-
+const upload = multer({ storage: multer.memoryStorage() });
 router.get("/", async (req: Request, res: Response) => {
   const books = await bookService.getAllBooks(req.query as Record<string, any>);
   if (books.length === 0) {
@@ -69,6 +71,24 @@ router.get("/search-with-relations", async (req: Request, res: Response) => {
 
   res.setHeader("x-total-count", result.total.toString());
   res.json(result);
+});
+
+router.post("/upload", upload.single("file"), async (req: any, res: any) => {
+  try {
+    const file = req.file;
+    if (!file) {
+      return res.status(400).send("No file uploaded.");
+    }
+
+    const bucket = "images";
+    const filePath = `uploads`;
+
+    // await uploadFile(bucket, filePath, file);
+    const fileKey = await uploadFile(bucket, filePath, file);
+    res.status(200).send(fileKey);
+  } catch (error) {
+    res.status(500).send("Error uploading file.");
+  }
 });
 
 export default router;
