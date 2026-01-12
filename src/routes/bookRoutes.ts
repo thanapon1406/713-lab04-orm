@@ -80,8 +80,12 @@ router.post("/upload", upload.single("file"), async (req: any, res: any) => {
       return res.status(400).send("No file uploaded.");
     }
 
-    const bucket = "images";
-    const filePath = `uploads`;
+    const bucket = process.env.SUPABASE_BUCKET_NAME;
+    const filePath = process.env.UPLOAD_DIR;
+
+    if (!bucket || !filePath) {
+      return res.status(500).send("Bucket or file path not configured.");
+    }
 
     // await uploadFile(bucket, filePath, file);
     const fileKey = await uploadFile(bucket, filePath, file);
